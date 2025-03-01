@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import 'pdfjs-dist/build/pdf.worker';
 import './App.css';
 
 function App() {
+  const canvasContainerRef = useRef(null);
+  const renderTaskRef = useRef(null); // Ref to store the render task
 
   useEffect(() => {
     const url = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
@@ -25,21 +27,36 @@ function App() {
         canvasContext,
         viewport,
       };
-      pdfPage.render(renderContext);
+
+      // Cancel previous render task if it exists
+      if (renderTaskRef.current) {
+        renderTaskRef.current.cancel();
+      }
+
+      // Store the new render task
+      renderTaskRef.current = pdfPage.render(renderContext);
+      await renderTaskRef.current.promise; // Wait for rendering to complete
 
       // Append the new canvas to the div
-      const canvasContainer = document.getElementById('canvas-container'); // Add a div in JSX
+      const canvasContainer = canvasContainerRef.current;
+      canvasContainer.innerHTML = ''; // Clear previous canvas, if any
       canvasContainer.appendChild(canvas);
     }
 
     loadPdf();
-  }, []); // Empty dependency array added here
+
+    return () => { // Cleanup function
+      if (renderTaskRef.current) {
+        renderTaskRef.current.cancel(); // Cancel render task on unmount
+      }
+    };
+  }, []); // Empty dependency array
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>PDF.js Sample</h1>
-        <div id="canvas-container"> {/* Add a div to hold the canvas */}
+        <div id="canvas-container" ref={canvasContainerRef}> {/* Ref to the container */}
         </div>
       </header>
     </div>
