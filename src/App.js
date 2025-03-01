@@ -1,11 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import 'pdfjs-dist/build/pdf.worker';
 import './App.css';
 
 function App() {
   const canvasContainerRef = useRef(null);
-  const renderTaskRef = useRef(null); // Ref to store the render task
+  const renderTaskRef = useRef(null);
+  const [textContent, setTextContent] = useState('');
 
   useEffect(() => {
     const url = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
@@ -35,28 +36,39 @@ function App() {
 
       // Store the new render task
       renderTaskRef.current = pdfPage.render(renderContext);
-      await renderTaskRef.current.promise; // Wait for rendering to complete
+      await renderTaskRef.current.promise;
 
       // Append the new canvas to the div
       const canvasContainer = canvasContainerRef.current;
-      canvasContainer.innerHTML = ''; // Clear previous canvas, if any
+      canvasContainer.innerHTML = '';
       canvasContainer.appendChild(canvas);
+
+      // Extract text content
+      const textContentData = await pdfPage.getTextContent();
+      const textItems = textContentData.items.map(item => item.str);
+      setTextContent(textItems.join(' '));
     }
 
     loadPdf();
 
-    return () => { // Cleanup function
+    return () => {
       if (renderTaskRef.current) {
-        renderTaskRef.current.cancel(); // Cancel render task on unmount
+        renderTaskRef.current.cancel();
       }
     };
-  }, []); // Empty dependency array
+  }, []);
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>PDF.js Sample</h1>
-        <div id="canvas-container" ref={canvasContainerRef}> {/* Ref to the container */}
+        <div className="pdf-container">
+          <div id="canvas-container" ref={canvasContainerRef}>
+          </div>
+          <textarea
+            className="text-area"
+            value={textContent}
+          />
         </div>
       </header>
     </div>
