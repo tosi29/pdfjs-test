@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/pdfjs-test/static/css/main.4bb65362.css",
+    "main.js": "/pdfjs-test/static/js/main.9b1dad6c.js",
+    "static/js/453.ef6b2807.chunk.js": "/pdfjs-test/static/js/453.ef6b2807.chunk.js",
+    "index.html": "/pdfjs-test/index.html",
+    "main.4bb65362.css.map": "/pdfjs-test/static/css/main.4bb65362.css.map",
+    "main.9b1dad6c.js.map": "/pdfjs-test/static/js/main.9b1dad6c.js.map",
+    "453.ef6b2807.chunk.js.map": "/pdfjs-test/static/js/453.ef6b2807.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4bb65362.css",
+    "static/js/main.9b1dad6c.js"
+  ]
+}
